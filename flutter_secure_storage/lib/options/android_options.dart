@@ -14,10 +14,12 @@ class AndroidOptions extends Options {
   const AndroidOptions({
     bool encryptedSharedPreferences = false,
     bool resetOnError = false,
+    // String keyStoreAlias = "default_masterkey_alias",
     KeyCipherAlgorithm keyCipherAlgorithm =
         KeyCipherAlgorithm.RSA_ECB_PKCS1Padding,
     StorageCipherAlgorithm storageCipherAlgorithm =
         StorageCipherAlgorithm.AES_CBC_PKCS7Padding,
+    this.keyStoreAlias,
     this.sharedPreferencesName,
     this.preferencesKeyPrefix,
   })  : _encryptedSharedPreferences = encryptedSharedPreferences,
@@ -49,6 +51,8 @@ class AndroidOptions extends Options {
   /// Plugin will fall back to default algorithm in previous system versions.
   final StorageCipherAlgorithm _storageCipherAlgorithm;
 
+  final String? keyStoreAlias;
+
   /// The name of the sharedPreference database to use.
   /// You can select your own name if you want. A default name will
   /// be used if nothing is provided here.
@@ -71,6 +75,7 @@ class AndroidOptions extends Options {
         'resetOnError': '$_resetOnError',
         'keyCipherAlgorithm': describeEnum(_keyCipherAlgorithm),
         'storageCipherAlgorithm': describeEnum(_storageCipherAlgorithm),
+        'keyStoreAlias': keyStoreAlias ?? '',
         'sharedPreferencesName': sharedPreferencesName ?? '',
         'preferencesKeyPrefix': preferencesKeyPrefix ?? '',
       };
@@ -80,8 +85,9 @@ class AndroidOptions extends Options {
     bool? resetOnError,
     KeyCipherAlgorithm? keyCipherAlgorithm,
     StorageCipherAlgorithm? storageCipherAlgorithm,
-    String? preferencesKeyPrefix,
+    String? keyStoreAlias,
     String? sharedPreferencesName,
+    String? preferencesKeyPrefix,
   }) =>
       AndroidOptions(
         encryptedSharedPreferences:
@@ -90,6 +96,7 @@ class AndroidOptions extends Options {
         keyCipherAlgorithm: keyCipherAlgorithm ?? _keyCipherAlgorithm,
         storageCipherAlgorithm:
             storageCipherAlgorithm ?? _storageCipherAlgorithm,
+        keyStoreAlias: keyStoreAlias,
         sharedPreferencesName: sharedPreferencesName,
         preferencesKeyPrefix: preferencesKeyPrefix,
       );

@@ -1,5 +1,7 @@
 package com.it_nomads.fluttersecurestorage;
 
+import android.app.KeyguardManager;
+import android.content.pm.PackageManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -29,6 +31,7 @@ public class FlutterSecureStorage {
     private final Context applicationContext;
     protected String ELEMENT_PREFERENCES_KEY_PREFIX = "VGhpcyBpcyB0aGUgcHJlZml4IGZvciBhIHNlY3VyZSBzdG9yYWdlCg";
     protected Map<String, Object> options;
+    private String KEYSTORE_ALIAS = MasterKey.DEFAULT_MASTER_KEY_ALIAS;
     private String SHARED_PREFERENCES_NAME = "FlutterSecureStorage";
     private SharedPreferences preferences;
     private StorageCipher storageCipher;
@@ -112,7 +115,7 @@ public class FlutterSecureStorage {
     }
 
     void deleteAll() {
-        ensureInitialized();
+       // ensureInitialized();
 
         final SharedPreferences.Editor editor = preferences.edit();
         editor.clear();
@@ -127,6 +130,10 @@ public class FlutterSecureStorage {
         // Check if already initialized.
         // TODO: Disable for now because this will break mixed usage of secureSharedPreference
 //        if (preferences != null) return;
+
+        if (options.containsKey("keyStoreAlias") && !((String) options.get("keyStoreAlias")).isEmpty()) {
+            KEYSTORE_ALIAS = (String) options.get("keyStoreAlias");
+        }
 
         if (options.containsKey("sharedPreferencesName") && !((String) options.get("sharedPreferencesName")).isEmpty()) {
             SHARED_PREFERENCES_NAME = (String) options.get("sharedPreferencesName");
@@ -219,14 +226,29 @@ public class FlutterSecureStorage {
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private SharedPreferences initializeEncryptedSharedPreferencesManager(Context context) throws GeneralSecurityException, IOException {
-        MasterKey key = new MasterKey.Builder(context)
-                .setKeyGenParameterSpec(
-                        new KeyGenParameterSpec
-                                .Builder(MasterKey.DEFAULT_MASTER_KEY_ALIAS, KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
-                                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-                                .setKeySize(256).build())
+
+        KeyguardManager keyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
+        boolean isDeviceSecure = keyguardManager.isDeviceSecure();
+
+        KeyGenParameterSpec.Builder builder = new KeyGenParameterSpec.Builder(KEYSTORE_ALIAS,
+        KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT);
+        builder.setBlockModes(KeyProperties.BLOCK_MODE_GCM);
+        builder.setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE);
+        builder.setKeySize(256);
+        builder.setUserAuthenticationRequired(isDeviceSecure);
+        builder.setUserAuthenticationValidityDurationSeconds(15);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && isDeviceSecure) {
+            boolean hasStrongBox = context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE);
+            builder.setUnlockedDeviceRequired(true);
+            builder.setIsStrongBoxBacked(hasStrongBox);
+        }
+        KeyGenParameterSpec advancedSpec = builder.build();
+
+        MasterKey key = new MasterKey.Builder(context, KEYSTORE_ALIAS)
+                .setKeyGenParameterSpec(advancedSpec)
                 .build();
+
         return EncryptedSharedPreferences.create(
                 context,
                 SHARED_PREFERENCES_NAME,
