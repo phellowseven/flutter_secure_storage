@@ -1,3 +1,27 @@
+## 9.0.0
+Breaking changes:
+* [Windows] Migrated to FFI with win32 package.
+
+## 8.1.0
+* [Android] Upgraded to Gradle 8.
+* [Android] Fixed resetOnError not working.
+* [Windows] Changed PathNotFoundException to FileSystemException to be backwards compatible with Flutter SDK 2.12.0.
+* [Windows] Applied lint suggestions.
+* [Linux] Remove and replace libjsoncpp1 dependency.
+* [Linux, macOS, Windows, Web] Update Dart SDK Constraint to support <4.0.0 instead of <3.0.0.
+
+## 8.0.0
+Breaking changes:
+* [macOS] The minimum macOS version supported is now 10.14.
+
+Other changes:
+* [Android] Fixed an issue when Encrypted Shared Preferences failed, the fallback would not handle the data correctly.
+* [Windows] Write encrypted data to files instead of the windows credential system.
+* [Linux] Fixed an issue with memory management.
+
+## 7.0.2
+[macOS] Fix issue with plugin name.
+
 ## 7.0.1
 [Android] Reverted double initialization of the SharedPreferences because this will break mixed usage of secureSharedPreference on Android.
 
@@ -10,13 +34,13 @@ Other changes:
 * [macOS] Upgraded codebase to swift which fixed containsKey always returning true.
 
 ## 6.1.0
-* [iOS] (From 6.1.0-beta.1) Migrated from objective C to Swift. This also fixes issues with constainsKey and possibly other issues.
+* [iOS] (From 6.1.0-beta.1) Migrated from objective C to Swift. This also fixes issues with containsKey and possibly other issues.
 * [Android] Upgrade security-crypto from 1.1.0-alpha03 to 1.1.0-alpha04
 * [Android] Fix deprecation warnings.
 * [All] Migrated from flutter_lints to lint and applied suggestions.
 
 ## 6.1.0-beta.1
-* [iOS] Migrated from objective C to Swift. This also fixes issues with constainsKey and possibly other issues.
+* [iOS] Migrated from objective C to Swift. This also fixes issues with containsKey and possibly other issues.
 
 ## 6.0.0
 * [Android] Upgrade to Android SDK 33.

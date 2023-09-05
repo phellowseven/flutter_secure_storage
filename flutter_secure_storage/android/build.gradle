@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.1'
+        classpath 'com.android.tools.build:gradle:8.1.1'
     }
 }
 
@@ -22,6 +22,14 @@ allprojects {
 apply plugin: 'com.android.library'
 
 android {
+    if (project.android.hasProperty("namespace")) {
+        namespace("com.it_nomads.fluttersecurestorage")
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
     compileSdkVersion 33
 
     compileOptions {
@@ -36,5 +44,5 @@ android {
 }
 
 dependencies {
-    implementation "androidx.security:security-crypto:1.1.0-alpha04"
+    implementation "androidx.security:security-crypto:1.1.0-alpha06"
 }
